@@ -28,17 +28,25 @@ echo "<?xml version='1.0' encoding='UTF-8' ?>";
 echo "<rss version='2.0'>";
 echo "<channel>";
 echo "<title>Feedback Stream</title>";
+echo "<generator>Cerb5FeedbackToRss.php</generator>";
  
 if("text/javascript; charset=utf-8" == $cerb5->getContentType()) {
 	$obj = json_decode($out);
 	if($obj->__status == "success") {
 		foreach($obj->results as $result) {
                     echo "\n<item>";
-                    echo "\n<!-- ".json_encode($result)."-->";
-		    echo "\n<title>".ucwords($result->quote_mood)." feedback from "
+                    echo "\n<!-- ".str_replace('--', '..', json_encode($result))."-->";
+                    echo "\n<category>".$result->quote_mood."</category>";
+		    		echo "\n<title>".ucwords($result->quote_mood)." feedback from "
                                .($result->author_address?$result->author_address:"someone")
                                ."</title>";
                     echo "\n<guid>".$base_url."feedback/".$result->id."</guid>";
+                    if($result->author_address) {
+                    	echo "\n<author>".$result->author_address."</author>";
+                    } else if($result->worker_address_address) {
+                        echo "\n<author>".$result->worker_address_address."</author>";
+                    }
+                    
                     if($result->url) {
                         echo "\n<link>".$result->url."</link>";
                     } else {
